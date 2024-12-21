@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Stock Review</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Daily Stock Review</h1>
+    </header>
+
+    <main>
+        <!-- Input Section -->
+        <section id="input-section">
+            <h2>Enter Emotional Candlestick Data</h2>
+            <form id="candlestick-form">
+                <label for="open">Open:</label>
+                <input type="number" id="open" name="open" step="0.01" required>
+                <label for="close">Close:</label>
+                <input type="number" id="close" name="close" step="0.01" required>
+                <label for="high">High:</label>
+                <input type="number" id="high" name="high" step="0.01" required>
+                <label for="low">Low:</label>
+                <input type="number" id="low" name="low" step="0.01" required>
+                <button type="submit">Add Data</button>
+            </form>
+        </section>
+
+        <!-- Graph Section -->
+        <section id="graph-section">
+            <h2>Candlestick Graph</h2>
+            <canvas id="candlestick-graph"></canvas>
+        </section>
+
+        <!-- Record Section -->
+        <section id="record-section">
+            <h2>Daily Records</h2>
+            <div id="record-list">
+                <!-- Example Record -->
+                <a href="#" class="record-link">2024/12/19复盘</a>
+                <a href="#" class="record-link">2024/12/20复盘</a>
+                <!-- More records will be dynamically added -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Daily Stock Review</p>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
