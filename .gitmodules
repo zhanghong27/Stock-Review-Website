@@ -1,0 +1,3 @@
+[submodule "stockReviewWeb-backend"]
+	path = stockReviewWeb-backend
+	url = https://github.com/zhanghong27/stockReviewWeb-backend.git
