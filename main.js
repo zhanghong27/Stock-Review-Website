@@ -83,75 +83,49 @@ function renderRecord(record) {
 
 // Function to update the graph
 function updateGraph() {
-    const labels = graphData.map(record => record.date);
-    const datasets = [
-        {
-            label: 'Open',
-            data: graphData.map(record => record.open),
-            borderColor: 'blue',
-            fill: false
-        },
-        {
-            label: 'Close',
-            data: graphData.map(record => record.close),
-            borderColor: 'green',
-            fill: false
-        },
-        {
-            label: 'High',
-            data: graphData.map(record => record.high),
-            borderColor: 'red',
-            fill: false
-        },
-        {
-            label: 'Low',
-            data: graphData.map(record => record.low),
-            borderColor: 'orange',
-            fill: false
-        }
-    ];
+    // Transform data for candlestick chart
+    const chartData = graphData.map(record => ({
+        x: record.date, // Date
+        y: [record.open, record.high, record.low, record.close] // Candlestick values
+    }));
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets
+    // Configure the candlestick chart
+    const options = {
+        series: [{
+            name: 'Stock Data',
+            data: chartData
+        }],
+        chart: {
+            type: 'candlestick',
+            height: 350
         },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                }
+        title: {
+            text: 'Stock Candlestick Chart',
+            align: 'left'
+        },
+        xaxis: {
+            type: 'datetime',
+            title: {
+                text: 'Date'
+            }
+        },
+        yaxis: {
+            tooltip: {
+                enabled: true
             },
-            interaction: {
-                mode: 'nearest',
-                axis: 'x',
-                intersect: false
-            },
-            scales: {
-                x: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
-                },
-                y: {
-                    display: true,
-                    title: {
-                        display: true,
-                        text: 'Value'
-                    }
-                }
+            title: {
+                text: 'Price'
             }
         }
-    });
+    };
+
+    // Clear the existing chart and render the new one
+    const chartContainer = document.querySelector('#candlestick-graph');
+    chartContainer.innerHTML = ''; // Clear previous chart
+    const chart = new ApexCharts(chartContainer, options);
+    chart.render();
 }
+
 
 // Form Submission
 form.addEventListener('submit', (e) => {
