@@ -20,23 +20,21 @@ app.use(bodyParser.json());
 
 // API to add a new stock review
 app.post('/api/stocks', async (req, res) => {
-    const { date, open, close, high, low } = req.body;
-
     try {
-        // Check if a record with the same date exists
-        const existing = await pool.query('SELECT * FROM reviews WHERE date = $1', [date]);
-        if (existing.rows.length > 0) {
-            return res.status(400).json({ error: `A record for date ${date} already exists.` });
-        }
+        const { date, open, close, high, low } = req.body;
 
-        // Insert new record
+        console.log(`POST request received: ${JSON.stringify(req.body)}`);
+
+        // Example database query (assuming PostgreSQL setup)
         const result = await pool.query(
             'INSERT INTO reviews (date, open, close, high, low) VALUES ($1, $2, $3, $4, $5) RETURNING *',
             [date, open, close, high, low]
         );
+
         res.status(201).json(result.rows[0]);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Error handling POST request:', err.message);
+        res.status(500).json({ error: 'Internal Server Error', details: err.message });
     }
 });
 
