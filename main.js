@@ -3,8 +3,7 @@
 // Elements
 const form = document.getElementById('candlestick-form');
 const recordList = document.getElementById('record-list');
-const graphCanvas = document.getElementById('candlestick-graph');
-const ctx = graphCanvas.getContext('2d');
+const graphContainer = document.getElementById('candlestick-graph');
 
 // Data Storage
 const records = [];
