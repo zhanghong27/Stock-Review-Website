@@ -11,7 +11,7 @@ const records = [];
 const graphData = [];
 
 // Backend API URL
-const apiUrl = 'https://<your-backend-url>/api/stocks'; // Replace with your backend URL
+const apiUrl = 'https://stockreviewweb-backend.onrender.com/api/stocks'
 
 // Function to fetch data from the backend
 function fetchData() {
