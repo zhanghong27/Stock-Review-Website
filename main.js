@@ -21,10 +21,19 @@ function fetchData() {
             console.log('Fetched data:', data); // Debugging log
             graphData.length = 0; // Clear existing graph data
             records.length = 0; // Clear existing records
+            recordList.innerHTML = ''; // Clear existing record list
 
             data.forEach(record => {
                 records.push(record);
-                graphData.push(record);
+                graphData.push({
+                    x: new Date(record.date).getTime(), // Convert to timestamp for ApexCharts
+                    y: [
+                        parseFloat(record.open),
+                        parseFloat(record.high),
+                        parseFloat(record.low),
+                        parseFloat(record.close)
+                    ]
+                });
                 renderRecord(record);
             });
 
@@ -60,7 +69,15 @@ function addRecord(date, open, close, high, low) {
         .then(savedRecord => {
             console.log('Record saved:', savedRecord); // Debugging log
             records.push(savedRecord);
-            graphData.push(savedRecord);
+            graphData.push({
+                x: new Date(savedRecord.date).getTime(),
+                y: [
+                    parseFloat(savedRecord.open),
+                    parseFloat(savedRecord.high),
+                    parseFloat(savedRecord.low),
+                    parseFloat(savedRecord.close)
+                ]
+            });
             renderRecord(savedRecord);
             updateGraph();
         })
@@ -83,45 +100,37 @@ function renderRecord(record) {
 
 // Function to update the graph
 function updateGraph() {
-    // Transform data for candlestick chart
-    const chartData = graphData.map(record => ({
-        x: record.date, // Date
-        y: [record.open, record.high, record.low, record.close] // Candlestick values
-    }));
+    console.log('Updating graph with data:', graphData);
 
     // Configure the candlestick chart
     const options = {
         series: [{
-            name: 'Stock Data',
-            data: chartData
+            data: graphData
         }],
         chart: {
             type: 'candlestick',
-            height: 350
+            height: 350,
+            width: '100%'
         },
         title: {
             text: 'Stock Candlestick Chart',
             align: 'left'
         },
         xaxis: {
-            type: 'datetime',
-            title: {
-                text: 'Date'
-            }
+            type: 'datetime'
         },
         yaxis: {
             tooltip: {
                 enabled: true
-            },
-            title: {
-                text: 'Price'
             }
         }
     };
 
-    // Clear the existing chart and render the new one
-    graphCanvas.innerHTML = ''; // Clear previous chart
-    const chart = new ApexCharts(graphCanvas, options);
+    // Clear the existing chart
+    document.querySelector('#candlestick-graph').innerHTML = '';
+    
+    // Create and render new chart
+    const chart = new ApexCharts(document.querySelector('#candlestick-graph'), options);
     chart.render();
 }
 
