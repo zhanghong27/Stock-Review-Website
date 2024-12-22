@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Pool } = require('pg');
+const cors = require('cors');
 
 require('dotenv').config();
 
@@ -22,6 +23,12 @@ const pool = new Pool({
 pool.connect()
     .then(() => console.log('Database connected successfully'))
     .catch(err => console.error('Database connection error:', err.message));
+
+app.use(cors({
+    origin: 'https://zhanghong27.github.io/Stock-Review-Website', // Replace with your frontend URL
+    methods: ['GET', 'POST'], // Specify allowed HTTP methods
+    credentials: true // Optional: Enable cookies if needed
+}));
 
 app.use(bodyParser.json());
 
