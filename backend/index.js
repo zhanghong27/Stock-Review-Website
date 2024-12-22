@@ -25,8 +25,8 @@ pool.connect()
     .catch(err => console.error('Database connection error:', err.message));
 
 app.use(cors({
-    origin: 'https://zhanghong27.github.io/Stock-Review-Website', // Replace with your frontend URL
-    methods: ['GET', 'POST'], // Specify allowed HTTP methods
+    origin: 'https://zhanghong27.github.io', 
+    methods: ['GET', 'POST'],
     credentials: true // Optional: Enable cookies if needed
 }));
 
