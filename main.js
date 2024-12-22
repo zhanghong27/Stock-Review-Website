@@ -10,6 +10,29 @@ const ctx = graphCanvas.getContext('2d');
 const records = [];
 const graphData = [];
 
+// Backend API URL
+const apiUrl = 'https://<your-backend-url>/api/stocks'; // Replace with your backend URL
+
+// Function to fetch data from the backend
+function fetchData() {
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Fetched data:', data); // Debugging log
+            graphData.length = 0; // Clear existing graph data
+            records.length = 0; // Clear existing records
+
+            data.forEach(record => {
+                records.push(record);
+                graphData.push(record);
+                renderRecord(record);
+            });
+
+            updateGraph();
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
 // Function to add a record
 function addRecord(date, open, close, high, low) {
     const record = {
@@ -20,10 +43,28 @@ function addRecord(date, open, close, high, low) {
         low: parseFloat(low)
     };
 
-    records.push(record);
-    graphData.push(record);
-    renderRecord(record);
-    updateGraph();
+    // Save record to backend
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(record)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to save record');
+            }
+            return response.json();
+        })
+        .then(savedRecord => {
+            console.log('Record saved:', savedRecord); // Debugging log
+            records.push(savedRecord);
+            graphData.push(savedRecord);
+            renderRecord(savedRecord);
+            updateGraph();
+        })
+        .catch(error => console.error('Error saving record:', error));
 }
 
 // Function to render a record in the list
@@ -126,3 +167,6 @@ form.addEventListener('submit', (e) => {
     console.log(records);
     form.reset();
 });
+
+// Fetch and render data on page load
+fetchData();
