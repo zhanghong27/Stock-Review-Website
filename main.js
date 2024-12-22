@@ -138,7 +138,7 @@ function updateGraph() {
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const date = new Date().toISOString().split('T')[0];
+    const date = form.date.value;
     const open = form.open.value;
     const close = form.close.value;
     const high = form.high.value;
