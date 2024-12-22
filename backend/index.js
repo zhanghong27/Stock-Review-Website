@@ -16,6 +16,10 @@ const pool = new Pool({
     port: process.env.DB_PORT,
 });
 
+pool.connect()
+    .then(() => console.log('Database connected successfully'))
+    .catch(err => console.error('Database connection error:', err.message));
+
 app.use(bodyParser.json());
 
 // API to add a new stock review
