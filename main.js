@@ -12,20 +12,27 @@ const graphData = [];
 // Backend API URL
 const apiUrl = 'https://stockreviewweb-backend.onrender.com/api/stocks'
 
+// Function to check if date is a weekend
+function isWeekend(date) {
+    const day = new Date(date).getDay();
+    return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
+}
+
 // Function to fetch data from the backend
 function fetchData() {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            console.log('Fetched data:', data); // Debugging log
-            graphData.length = 0; // Clear existing graph data
-            records.length = 0; // Clear existing records
-            recordList.innerHTML = ''; // Clear existing record list
+            console.log('Fetched data:', data);
+            graphData.length = 0;
+            records.length = 0;
+            recordList.innerHTML = '';
 
-            data.forEach(record => {
+            // Filter out weekends
+            data.filter(record => !isWeekend(record.date)).forEach(record => {
                 records.push(record);
                 graphData.push({
-                    x: new Date(record.date).getTime(), // Convert to timestamp for ApexCharts
+                    x: new Date(record.date).getTime(),
                     y: [
                         parseFloat(record.open),
                         parseFloat(record.high),
@@ -86,12 +93,13 @@ function addRecord(date, open, close, high, low) {
 // Function to render a record in the list
 function renderRecord(record) {
     const link = document.createElement('a');
-    link.textContent = `${record.date} 复盘`;
+    const formattedDate = record.date.split('T')[0];
+    link.textContent = `${formattedDate} 复盘`;
     link.href = '#';
     link.classList.add('record-link');
     link.addEventListener('click', (e) => {
         e.preventDefault();
-        alert(`Review for ${record.date}\nOpen: ${record.open}\nClose: ${record.close}\nHigh: ${record.high}\nLow: ${record.low}`);
+        alert(`Review for ${formattedDate}\nOpen: ${record.open}\nClose: ${record.close}\nHigh: ${record.high}\nLow: ${record.low}`);
     });
 
     recordList.appendChild(link);
@@ -101,7 +109,6 @@ function renderRecord(record) {
 function updateGraph() {
     console.log('Updating graph with data:', graphData);
 
-    // Configure the candlestick chart
     const options = {
         series: [{
             data: graphData
@@ -110,6 +117,14 @@ function updateGraph() {
             type: 'candlestick',
             height: 350,
             width: '100%'
+        },
+        plotOptions: {
+            candlestick: {
+                colors: {
+                    upward: '#ef5350',   // Red for rise
+                    downward: '#26a69a'  // Green for fall
+                }
+            }
         },
         title: {
             text: 'Stock Candlestick Chart',
@@ -125,20 +140,23 @@ function updateGraph() {
         }
     };
 
-    // Clear the existing chart
     document.querySelector('#candlestick-graph').innerHTML = '';
-    
-    // Create and render new chart
     const chart = new ApexCharts(document.querySelector('#candlestick-graph'), options);
     chart.render();
 }
-
 
 // Form Submission
 form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const date = form.date.value;
+    
+    // Check if selected date is a weekend
+    if (isWeekend(date)) {
+        alert('Weekend data cannot be added. Stock market is closed on weekends.');
+        return;
+    }
+
     const open = form.open.value;
     const close = form.close.value;
     const high = form.high.value;
