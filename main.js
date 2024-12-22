@@ -120,9 +120,8 @@ function updateGraph() {
     };
 
     // Clear the existing chart and render the new one
-    const chartContainer = document.querySelector('#candlestick-graph');
-    chartContainer.innerHTML = ''; // Clear previous chart
-    const chart = new ApexCharts(chartContainer, options);
+    graphCanvas.innerHTML = ''; // Clear previous chart
+    const chart = new ApexCharts(graphCanvas, options);
     chart.render();
 }
 
