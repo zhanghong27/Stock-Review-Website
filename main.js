@@ -16,9 +16,9 @@ const apiUrl = 'https://stockreviewweb-backend.onrender.com/api/stocks'
 function isWeekend(date) {
     // Convert string date to Date object if it's not already
     const dateObj = date instanceof Date ? date : new Date(date);
-    // Adjust for UTC timezone
-    const utcDay = dateObj.getUTCDay();
-    return utcDay === 6 || utcDay === 0; // 6 is Saturday, 0 is Sunday
+    // Get local day (0 = Sunday, 6 = Saturday)
+    const day = dateObj.getDay();
+    return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
 }
 
 // Function to fetch data from the backend
