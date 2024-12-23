@@ -31,20 +31,27 @@ function fetchData() {
             records.length = 0;
             recordList.innerHTML = '';
 
-            // Filter out weekends
-            data.filter(record => !isWeekend(record.date)).forEach(record => {
-                records.push(record);
-                graphData.push({
-                    x: new Date(record.date).getTime(),
-                    y: [
-                        parseFloat(record.open),
-                        parseFloat(record.high),
-                        parseFloat(record.low),
-                        parseFloat(record.close)
-                    ]
+            // Sort data by date first
+            const sortedData = data.sort((a, b) => 
+                new Date(a.date).getTime() - new Date(b.date).getTime()
+            );
+
+            // Filter out weekends and process data
+            sortedData
+                .filter(record => !isWeekend(record.date))
+                .forEach(record => {
+                    records.push(record);
+                    graphData.push({
+                        x: new Date(record.date).getTime(),
+                        y: [
+                            parseFloat(record.open),
+                            parseFloat(record.high),
+                            parseFloat(record.low),
+                            parseFloat(record.close)
+                        ]
+                    });
+                    renderRecord(record);
                 });
-                renderRecord(record);
-            });
 
             updateGraph();
         })
@@ -112,15 +119,9 @@ function renderRecord(record) {
 function updateGraph() {
     console.log('Updating graph with data:', graphData);
 
-    // Sort data by date
-    const sortedData = graphData.sort((a, b) => a.x - b.x);
-    
-    // Remove gaps between Friday and Monday
-    const noWeekendData = sortedData.filter(item => !isWeekend(new Date(item.x)));
-
     const options = {
         series: [{
-            data: noWeekendData
+            data: graphData
         }],
         chart: {
             type: 'candlestick',
@@ -144,7 +145,8 @@ function updateGraph() {
             labels: {
                 formatter: function(val) {
                     return new Date(val).toLocaleDateString();
-                }
+                },
+                datetimeUTC: false
             },
             axisBorder: {
                 show: true
