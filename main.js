@@ -112,9 +112,15 @@ function renderRecord(record) {
 function updateGraph() {
     console.log('Updating graph with data:', graphData);
 
+    // Sort data by date
+    const sortedData = graphData.sort((a, b) => a.x - b.x);
+    
+    // Remove gaps between Friday and Monday
+    const noWeekendData = sortedData.filter(item => !isWeekend(new Date(item.x)));
+
     const options = {
         series: [{
-            data: graphData
+            data: noWeekendData
         }],
         chart: {
             type: 'candlestick',
@@ -137,14 +143,9 @@ function updateGraph() {
             type: 'datetime',
             labels: {
                 formatter: function(val) {
-                    const date = new Date(val);
-                    if (isWeekend(date)) {
-                        return ''; // Hide weekend dates
-                    }
-                    return date.toLocaleDateString();
+                    return new Date(val).toLocaleDateString();
                 }
             },
-            tickAmount: 'dataPoints',
             axisBorder: {
                 show: true
             },
