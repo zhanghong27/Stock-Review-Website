@@ -14,8 +14,11 @@ const apiUrl = 'https://stockreviewweb-backend.onrender.com/api/stocks'
 
 // Function to check if date is a weekend
 function isWeekend(date) {
-    const day = new Date(date).getDay();
-    return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
+    // Convert string date to Date object if it's not already
+    const dateObj = date instanceof Date ? date : new Date(date);
+    // Adjust for UTC timezone
+    const utcDay = dateObj.getUTCDay();
+    return utcDay === 6 || utcDay === 0; // 6 is Saturday, 0 is Sunday
 }
 
 // Function to fetch data from the backend
@@ -131,7 +134,23 @@ function updateGraph() {
             align: 'left'
         },
         xaxis: {
-            type: 'datetime'
+            type: 'datetime',
+            labels: {
+                formatter: function(val) {
+                    const date = new Date(val);
+                    if (isWeekend(date)) {
+                        return ''; // Hide weekend dates
+                    }
+                    return date.toLocaleDateString();
+                }
+            },
+            tickAmount: 'dataPoints',
+            axisBorder: {
+                show: true
+            },
+            axisTicks: {
+                show: true
+            }
         },
         yaxis: {
             tooltip: {
