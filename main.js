@@ -40,6 +40,7 @@ function fetchData() {
             sortedData
                 .filter(record => !isWeekend(record.date))
                 .forEach(record => {
+                    console.log(new Date(record.date).getTime());
                     records.push(record);
                     graphData.push({
                         x: new Date(record.date).getTime(),

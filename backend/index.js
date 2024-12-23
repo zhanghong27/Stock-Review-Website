@@ -24,8 +24,19 @@ pool.connect()
     .then(() => console.log('Database connected successfully'))
     .catch(err => console.error('Database connection error:', err.message));
 
+const allowedOrigins = [
+    'https://zhanghong27.github.io', 
+    'http://127.0.0.1:5500'
+];
+
 app.use(cors({
-    origin: 'https://zhanghong27.github.io', 
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST'],
     credentials: true // Optional: Enable cookies if needed
 }));
