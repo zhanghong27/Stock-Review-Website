@@ -16,9 +16,12 @@ const apiUrl = 'https://stockreviewweb-backend.onrender.com/api/stocks'
 function isWeekend(date) {
     // Convert string date to Date object if it's not already
     const dateObj = date instanceof Date ? date : new Date(date);
-    // Get local day (0 = Sunday, 6 = Saturday)
-    const day = dateObj.getDay();
-    return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
+    const utcOffset = 8; // Offset for China Standard Time (CST) in hours
+    const chineseDate = new Date(dateObj.getTime() + utcOffset * 60 * 60 * 1000);
+    
+    // Get the day in Chinese timezone (0 = Sunday, 6 = Saturday)
+    const day = chineseDate.getUTCDay();
+    return day === 0 || day === 6; // Sunday or Saturday in Chinese timezone
 }
 
 // Function to fetch data from the backend
@@ -40,10 +43,14 @@ function fetchData() {
             sortedData
                 .filter(record => !isWeekend(record.date))
                 .forEach(record => {
-                    console.log(new Date(record.date).getTime());
                     records.push(record);
+                    // Adjust the date for China timezone
+                    const date = new Date(record.date);
+                    const utcOffset = 8; // CST offset
+                    const localDate = new Date(date.getTime() + utcOffset * 60 * 60 * 1000);
+                    
                     graphData.push({
-                        x: new Date(record.date).getTime(),
+                        x: localDate,
                         y: [
                             parseFloat(record.open),
                             parseFloat(record.high),
@@ -84,10 +91,16 @@ function addRecord(date, open, close, high, low) {
             return response.json();
         })
         .then(savedRecord => {
-            console.log('Record saved:', savedRecord); // Debugging log
+            console.log('Record saved:', savedRecord);
             records.push(savedRecord);
+            
+            // Adjust the date for China timezone
+            const date = new Date(savedRecord.date);
+            const utcOffset = 8; // CST offset
+            const localDate = new Date(date.getTime() + utcOffset * 60 * 60 * 1000);
+            
             graphData.push({
-                x: new Date(savedRecord.date).getTime(),
+                x: localDate.getTime(),
                 y: [
                     parseFloat(savedRecord.open),
                     parseFloat(savedRecord.high),
@@ -133,7 +146,7 @@ function updateGraph() {
             candlestick: {
                 colors: {
                     upward: '#ef5350',   // Red for rise
-                    downward: '#26a69a'  // Green for fall
+                    downward: '#00ab6b'  // Green for fall
                 }
             }
         },
@@ -142,12 +155,11 @@ function updateGraph() {
             align: 'left'
         },
         xaxis: {
-            type: 'datetime',
+            type: 'category',
             labels: {
                 formatter: function(val) {
-                    return new Date(val).toLocaleDateString();
-                },
-                datetimeUTC: false
+                    return dayjs(val).format('YYYY-MM-DD');
+                }
             },
             axisBorder: {
                 show: true
