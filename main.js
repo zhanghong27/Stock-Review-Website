@@ -10,7 +10,10 @@ const records = [];
 const graphData = [];
 
 // Backend API URL
-const apiUrl = 'https://stockreviewweb-backend.onrender.com/api/stocks'
+const apiUrl = 'http://localhost:3000/api/stocks'
+
+// Add this near the top with other global variables
+let selectedRecord = null;
 
 // Function to check if date is a weekend
 function isWeekend(date) {
@@ -28,14 +31,16 @@ function isWeekend(date) {
 function fetchData() {
     fetch(apiUrl)
         .then(response => response.json())
-        .then(data => {
-            console.log('Fetched data:', data);
+        .then(json => {
+            console.log('Fetched data:', json);
+            // Access the actual array from the "data" property.
+            const stocks = json.data || [];
             graphData.length = 0;
             records.length = 0;
             recordList.innerHTML = '';
 
             // Sort data by date first
-            const sortedData = data.sort((a, b) => 
+            const sortedData = stocks.sort((a, b) => 
                 new Date(a.date).getTime() - new Date(b.date).getTime()
             );
 
@@ -65,6 +70,7 @@ function fetchData() {
         })
         .catch(error => console.error('Error fetching data:', error));
 }
+
 
 // Function to add a record
 function addRecord(date, open, close, high, low) {
@@ -121,9 +127,26 @@ function renderRecord(record) {
     link.textContent = `${formattedDate} 复盘`;
     link.href = '#';
     link.classList.add('record-link');
+    
+    // Add click handler for selection
     link.addEventListener('click', (e) => {
         e.preventDefault();
-        alert(`Review for ${formattedDate}\nOpen: ${record.open}\nClose: ${record.close}\nHigh: ${record.high}\nLow: ${record.low}`);
+        
+        // Remove selected class from all links
+        document.querySelectorAll('.record-link').forEach(link => {
+            link.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked link
+        link.classList.add('selected');
+        
+        // Update selectedRecord and form values
+        selectedRecord = record;
+        form.date.value = formattedDate;
+        form.open.value = record.open;
+        form.close.value = record.close;
+        form.high.value = record.high;
+        form.low.value = record.low;
     });
 
     recordList.appendChild(link);
@@ -204,3 +227,59 @@ form.addEventListener('submit', (e) => {
 
 // Fetch and render data on page load
 fetchData();
+
+// Add these event listeners after your existing form submission handler
+
+document.getElementById('edit-data-btn').addEventListener('click', () => {
+    if (!selectedRecord) {
+        alert('Please select a record to edit first');
+        return;
+    }
+    
+    const data = {
+        date: form.date.value,
+        open: parseFloat(form.open.value),
+        close: parseFloat(form.close.value),
+        high: parseFloat(form.high.value),
+        low: parseFloat(form.low.value)
+    };
+
+    fetch(`${apiUrl}/${selectedRecord._id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update record');
+            }
+            selectedRecord = null;
+            fetchData();
+            form.reset();
+        })
+        .catch(error => console.error('Error updating record:', error));
+});
+
+document.getElementById('delete-data-btn').addEventListener('click', () => {
+    if (!selectedRecord) {
+        alert('Please select a record to delete first');
+        return;
+    }
+
+    if (confirm('Are you sure you want to delete this record?')) {
+        fetch(`${apiUrl}/${selectedRecord._id}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete record');
+                }
+                selectedRecord = null;
+                fetchData();
+                form.reset();
+            })
+            .catch(error => console.error('Error deleting record:', error));
+    }
+});

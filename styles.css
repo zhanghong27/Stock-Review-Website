@@ -126,3 +126,43 @@ footer {
     color: white;
     margin-top: 1.5rem;
 }
+
+.form-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.form-buttons button {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+#add-data-btn {
+    background-color: #4CAF50;
+}
+
+#add-data-btn:hover {
+    background-color: #45a049;
+}
+
+#edit-data-btn {
+    background-color: #2196F3;
+}
+
+#edit-data-btn:hover {
+    background-color: #1976D2;
+}
+
+#delete-data-btn {
+    background-color: #f44336;
+}
+
+#delete-data-btn:hover {
+    background-color: #da190b;
+}
